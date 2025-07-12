@@ -1,0 +1,236 @@
+--[[ 
+🌱 Grow A Garden Script
+Parts:
+1️⃣ Main
+2️⃣ Auto Buy
+3️⃣ Teleport
+4️⃣ Misc
+5️⃣ Player
+]]
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- ===================================
+-- 1️⃣ Part 1: Main
+-- ===================================
+local function autoFarm()
+    while getgenv().autoFarm do
+        print("[AutoFarm] Farming...")
+        -- Replace with real RemoteEvent, e.g.:
+        -- game:GetService("ReplicatedStorage").Farm:FireServer()
+        wait(1)
+    end
+end
+
+local function autoSell()
+    while getgenv().autoSell do
+        print("[AutoSell] Selling...")
+        -- game:GetService("ReplicatedStorage").Sell:FireServer()
+        wait(1)
+    end
+end
+
+local function autoCollect()
+    while getgenv().autoCollect do
+        print("[AutoCollect] Collecting items...")
+        -- e.g., collect dropped items logic
+        wait(1)
+    end
+end
+
+local function oneClickPlantRemove()
+    local mouse = player:GetMouse()
+    mouse.Button1Down:Connect(function()
+        if player.Character and player.Character:FindFirstChild("Shovel") then
+            print("[OneClickRemove] Clicked while holding shovel")
+            -- game:GetService("ReplicatedStorage").RemovePlant:FireServer(target)
+        end
+    end)
+end
+
+-- ===================================
+-- 2️⃣ Part 2: Auto Buy
+-- ===================================
+local seedsToBuy = {
+    "carrot seed", "strawberry seed", "blueberry seed", "orange tulip seed", "tomato seed",
+    "daffodil seed", "resberry seed", "corn seed", "watermelon seed", "pumpkin seed",
+    "bamboo seed", "coconut seed", "cactus seed", "dragon fruit seed", "mango seed",
+    "grape seed", "mushroom seed", "pepper seed", "cacao seed", "beanstalk seed",
+    "emberlily seed", "sugar apple seed", "burning bud seed", "apple seed"
+}
+
+local gearToBuy = {
+    "watering can", "trowel", "recall wrench", "basic sprinkler", "advanced sprinkler",
+    "godly sprinkler", "magnifying glass", "tanning mirror", "master sprinkler",
+    "cleaning spray", "favorite tool", "harvest tool", "friendship pot"
+}
+
+local eggsToBuy = {
+    "common egg", "common summer egg", "rare egg", "uncommon egg", "legendary egg",
+    "mythical egg", "bug egg", "bee egg", "rare summer egg", "paradise egg"
+}
+
+local function autoBuySeeds()
+    for _, seedName in ipairs(seedsToBuy) do
+        if getgenv()["buy_"..seedName] then
+            print("[AutoBuySeeds] Buying:", seedName)
+            -- game:GetService("ReplicatedStorage").BuySeed:FireServer(seedName)
+        end
+    end
+end
+
+local function autoBuyGear()
+    for _, gearName in ipairs(gearToBuy) do
+        if getgenv()["buy_"..gearName] then
+            print("[AutoBuyGear] Buying:", gearName)
+            -- game:GetService("ReplicatedStorage").BuyGear:FireServer(gearName)
+        end
+    end
+end
+
+local function autoBuyEggs()
+    for _, eggName in ipairs(eggsToBuy) do
+        if getgenv()["buy_"..eggName] then
+            print("[AutoBuyEggs] Buying:", eggName)
+            -- game:GetService("ReplicatedStorage").BuyEgg:FireServer(eggName)
+        end
+    end
+end
+
+-- ===================================
+-- 3️⃣ Part 3: Teleport
+-- ===================================
+local function teleportToEventMiddle()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local targetPosition = Vector3.new(0, 10, 0) -- Replace with your real coordinates
+        player.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition)
+        print("[Teleport] Teleported to event middle part")
+    else
+        warn("[Teleport] Character or HumanoidRootPart not found")
+    end
+end
+
+-- ===================================
+-- 4️⃣ Part 4: Misc
+-- ===================================
+local seedsToPlant = {
+    "carrot seed", "strawberry seed", "blueberry seed", "orange tulip seed", "tomato seed",
+    "daffodil seed", "resberry seed", "corn seed", "watermelon seed", "pumpkin seed",
+    "bamboo seed", "coconut seed", "cactus seed", "dragon fruit seed", "mango seed",
+    "grape seed", "mushroom seed", "pepper seed", "cacao seed", "beanstalk seed",
+    "emberlily seed", "sugar apple seed", "burning bud seed", "apple seed"
+}
+
+local fruitsToFeed = {
+    "carrot", "strawberry", "blueberry", "orange tulip", "tomato",
+    "daffodil", "resberry", "corn", "watermelon", "pumpkin",
+    "bamboo", "coconut", "cactus", "dragon fruit", "mango",
+    "grape", "mushroom", "pepper", "cacao", "beanstalk",
+    "emberlily", "sugar apple", "burning bud", "apple"
+}
+
+local function autoPlantSeeds()
+    for _, seedName in ipairs(seedsToPlant) do
+        if getgenv()["plant_"..seedName] then
+            print("[AutoPlant] Planting:", seedName, "at stacked position")
+            -- game:GetService("ReplicatedStorage").PlantSeed:FireServer(seedName, position)
+        end
+    end
+end
+
+local function autoFeedPet()
+    for _, fruitName in ipairs(fruitsToFeed) do
+        if getgenv()["feed_"..fruitName] then
+            print("[AutoFeedPet] Feeding pet with:", fruitName)
+            -- game:GetService("ReplicatedStorage").FeedPet:FireServer(fruitName)
+        end
+    end
+end
+
+-- ===================================
+-- 5️⃣ Part 5: Player
+-- ===================================
+local function setWalkSpeed(speed)
+    humanoid.WalkSpeed = speed
+    print("[Player] WalkSpeed set to:", speed)
+end
+
+local function setJumpPower(power)
+    humanoid.JumpPower = power
+    print("[Player] JumpPower set to:", power)
+end
+
+local flying = false
+local flyBV, flyBG
+
+local function startFly()
+    if flying then return end
+    flying = true
+
+    local root = character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    flyBV = Instance.new("BodyVelocity")
+    flyBV.Velocity = Vector3.new(0,0,0)
+    flyBV.MaxForce = Vector3.new(9e4, 9e4, 9e4)
+    flyBV.Parent = root
+
+    flyBG = Instance.new("BodyGyro")
+    flyBG.CFrame = root.CFrame
+    flyBG.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    flyBG.P = 9e4
+    flyBG.Parent = root
+
+    local UIS = game:GetService("UserInputService")
+    local control = {F=0,B=0,L=0,R=0,U=0,D=0}
+
+    UIS.InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.W then control.F = 1 end
+        if input.KeyCode == Enum.KeyCode.S then control.B = -1 end
+        if input.KeyCode == Enum.KeyCode.A then control.L = -1 end
+        if input.KeyCode == Enum.KeyCode.D then control.R = 1 end
+        if input.KeyCode == Enum.KeyCode.Space then control.U = 1 end
+        if input.KeyCode == Enum.KeyCode.LeftControl then control.D = -1 end
+    end)
+
+    UIS.InputEnded:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.W then control.F = 0 end
+        if input.KeyCode == Enum.KeyCode.S then control.B = 0 end
+        if input.KeyCode == Enum.KeyCode.A then control.L = 0 end
+        if input.KeyCode == Enum.KeyCode.D then control.R = 0 end
+        if input.KeyCode == Enum.KeyCode.Space then control.U = 0 end
+        if input.KeyCode == Enum.KeyCode.LeftControl then control.D = 0 end
+    end)
+
+    spawn(function()
+        while flying do
+            local move = Vector3.new(control.L+control.R, control.U+control.D, control.F+control.B)
+            flyBV.Velocity = (root.CFrame):vectorToWorldSpace(move * 50)
+            flyBG.CFrame = workspace.CurrentCamera.CFrame
+            wait()
+        end
+    end)
+end
+
+local function stopFly()
+    flying = false
+    if flyBV then flyBV:Destroy() end
+    if flyBG then flyBG:Destroy() end
+    print("[Player] Fly stopped")
+end
+
+-- ===================================
+-- ✅ Done! 
+-- Call your functions however you want below, or connect to GUI.
+-- ===================================
+
+print("🌱 Grow A Garden script loaded!")
+
+-- Example usage:
+-- getgenv().autoFarm = true; spawn(autoFarm)
+-- setWalkSpeed(100)
+-- startFly()
+
+-- Replace prints with actual RemoteEvent calls to fully enable functionality.
