@@ -1,5 +1,3 @@
--- 🌱 Roblox Grow A Garden: Pet Control Script
-
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 
