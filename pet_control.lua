@@ -1,51 +1,66 @@
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
-
--- store the position the player selects
+local UIS = game:GetService("UserInputService")
 local selectedPetPosition = nil
 
--- 🐾 function to move pet to chosen point
+print("🌱 [PetControl] Script loaded! Tap or click anywhere to choose where your pet stops & uses ability.")
+
+-- 🐾 Move pet
 local function movePetToSelectedPosition()
     if selectedPetPosition then
-        -- Replace below with real RemoteEvent / function to move your pet
+        -- 🔧 Replace below with real RemoteEvent to move your pet:
         -- game:GetService("ReplicatedStorage").MovePet:FireServer(selectedPetPosition)
-        print("[Pet] Moving pet to position:", selectedPetPosition)
+        print("[PetControl] Moving pet to:", selectedPetPosition)
     else
-        warn("[Pet] No position selected yet!")
+        warn("[PetControl] No position selected yet!")
     end
 end
 
--- ✨ function to make pet use its ability at current position
+-- ✨ Use pet ability
 local function usePetAbility()
-    -- Replace below with real RemoteEvent to trigger pet's ability
+    -- 🔧 Replace below with real RemoteEvent:
     -- game:GetService("ReplicatedStorage").PetAbility:FireServer()
-    print("[Pet] Using ability at position:", selectedPetPosition)
+    print("[PetControl] Pet using ability at:", selectedPetPosition)
 end
 
--- 📍 click somewhere to select where the pet should stop
+-- 📍 Handle PC click
 mouse.Button1Down:Connect(function()
-    -- get the 3D point in the world where the player clicked
     local target = mouse.Hit
     if target then
         selectedPetPosition = target.Position
-        print("[Pet] Selected new stop position:", selectedPetPosition)
-
-        -- move pet there immediately
+        print("[PetControl] New position selected (PC):", selectedPetPosition)
         movePetToSelectedPosition()
-
-        -- and optionally use ability right away
         usePetAbility()
     end
 end)
 
--- 🛠 you could also call usePetAbility() repeatedly if you want the pet to keep using ability:
+-- 📱 Handle mobile tap
+UIS.TouchTap:Connect(function(touchPositions, isProcessed)
+    if isProcessed then return end
+    if #touchPositions > 0 then
+        -- project tap into 3D space
+        local camera = workspace.CurrentCamera
+        local viewportPoint = touchPositions[1]
+        local unitRay = camera:ViewportPointToRay(viewportPoint.X, viewportPoint.Y)
+        local raycastParams = RaycastParams.new()
+        raycastParams.FilterDescendantsInstances = {player.Character}
+        raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+        local raycastResult = workspace:Raycast(unitRay.Origin, unitRay.Direction * 500, raycastParams)
+        if raycastResult then
+            selectedPetPosition = raycastResult.Position
+            print("[PetControl] New position selected (Mobile):", selectedPetPosition)
+            movePetToSelectedPosition()
+            usePetAbility()
+        end
+    end
+end)
+
+-- ✅ Optional: auto use ability every X seconds
 --[[
 while true do
     if selectedPetPosition then
         usePetAbility()
     end
-    wait(5) -- adjust the delay between abilities
+    wait(5)
 end
 ]]
-
-print("🌱 Pet control script loaded! Click anywhere to set where your pet will stop & use ability.")
