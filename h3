@@ -1,0 +1,34 @@
+-- 🌱 Key system (patched to be keyless)
+local function checkKey(inputKey)
+    -- Originally: if inputKey == storedKey then ...
+    return true  -- always allow
+end
+
+-- 🛒 Buy seeds logic (updated with your seeds)
+local seedsToBuy = {
+    "carrot seed", "strawberry", "blueberry", "orange tulip", "tomato",
+    "daffodil", "resberry", "corn", "watermelon", "pumpkin",
+    "bamboo", "coconut", "cactus", "dragon fruit", "mango",
+    "grape", "mushroom", "pepper", "cacao", "beanstalk",
+    "emberlily", "sugar apple", "burning bud", "apple"
+}
+
+local function buySeeds()
+    for _, seedName in ipairs(seedsToBuy) do
+        -- replace this with your actual buy call:
+        -- e.g., game:GetService("ReplicatedStorage").BuySeed:FireServer(seedName)
+        print("Buying seed:", seedName)
+    end
+end
+
+-- ✅ Removed summer shop, summer event, honey event
+-- (delete or comment out the original code blocks that handled those)
+
+-- 🌱 Example of how you might run it:
+local inputKey = "anything"
+if checkKey(inputKey) then
+    print("Key accepted (keyless mode)")
+    buySeeds()
+else
+    print("Invalid key")
+end
